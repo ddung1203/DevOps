@@ -159,7 +159,7 @@ eksctl create cluster -f myeks.yaml
 ### AWS Load Balancer Controller 설치
 
 ```bash
-helm repo add eks <https://aws.github.io/eks-charts>
+helm repo add eks https://aws.github.io/eks-charts
 helm repo update
 ```
 
@@ -278,7 +278,7 @@ eksctl create addon --name aws-ebs-csi-driver --cluster myeks-custom --service-a
 > 
 
 ```bash
-kubectl apply -f <https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml>
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
 ## Cluster Autoscaler
@@ -295,7 +295,7 @@ eksctl scale nodegroup --name myeks-ng1 --cluster myeks-custom --nodes 2
 > 
 
 ```bash
-curl -o cluster-autoscaler-autodiscover.yaml <https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml>
+curl -o cluster-autoscaler-autodiscover.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
 ```
 
 `cluster-autoscaler-autodiscover.yaml`
