@@ -16,7 +16,7 @@ chmod 700 get_helm.sh
 helm create ./
 ```
 
-![Untitled](Helm%20d0c8707c89a9478fb6593b0ab339798e/Untitled.png)
+![Untitled](../images/Helm_0.png)
 
 - Chart.yaml : helm chart에 대한 정보가 담겨있음
 - values.yaml : helm chart에서 사용하는 각종 값들에 대한 정의
