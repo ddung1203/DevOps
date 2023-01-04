@@ -20,4 +20,4 @@
 
 [Kubernetes Dashboard](./DevOps/Kubernetes_Dashboard.md)
 
-[Loki Logging System](./DevOps/Loki_Loggins_System.md)
+[Loki Logging System](./DevOps/Loki_Logging_System.md)
