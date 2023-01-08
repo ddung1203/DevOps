@@ -21,3 +21,5 @@
 [Kubernetes Dashboard](./DevOps/Kubernetes_Dashboard.md)
 
 [Loki Logging System](./DevOps/Loki_Logging_System.md)
+
+[Run a Stateful Application - MySQL](./DevOps/Run_a_Stateful_Application_-_MySQL.md)
