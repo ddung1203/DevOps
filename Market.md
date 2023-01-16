@@ -4,6 +4,134 @@
 
 ### 1. EC2 생성
 
+`Dockerfile`
+```
+FROM tomcat:9.0.70-jdk8-corretto-al2
+
+COPY ./target/ict-1.0.0-BUILD-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+
+EXPOSE 8080
+```
+
+`Jenkinsfile`
+```
+pipeline {
+  agent any
+
+  environment{
+    githubCredential='ddung1203-at-385722565672'
+    AWS_CREDENTIAL_NAME='ECR'
+    gitEmail='ddung1203@gsneotek.com'
+    gitName='Joongseok Jeon'
+  }
+
+  stages {
+    stage('Checkout Application Git Branch') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: githubCredential, url: 'https://git-codecommit.ap-northeast-2.amazonaws.com/v1/repos/CheongA_Market']]])
+      }
+      post {
+        failure {
+          echo 'Repository Clone Failure' 
+          slackSend (color: '#FF0000', message: "FAILED: Repository Clone Failure")
+        }
+        success {
+          echo 'Repository Clone Success' 
+          slackSend (color: '#0AC9FF', message: "SUCCESS: Repository Clone Success")
+        }
+      }
+    }
+
+    stage('MVN Clean Package') {
+      steps {
+        sh "mvn clean package"
+      }
+      post {
+        failure {
+          echo 'MVN Build Failure' 
+          slackSend (color: '#FF0000', message: "FAILED: MVN Build Failure")
+        }
+        success {
+          echo 'MVN Build Success' 
+          slackSend (color: '#0AC9FF', message: "SUCCESS: MVN Build Success")
+        }
+      }
+    }
+    
+    stage('Docker Image Build') {
+      steps{
+        sh "docker build -t cheonga-market ."
+        sh "docker tag cheonga-market:latest 385722565672.dkr.ecr.ap-northeast-2.amazonaws.com/cheonga-market:${BUILD_NUMBER}"
+        sh "docker tag cheonga-market:latest 385722565672.dkr.ecr.ap-northeast-2.amazonaws.com/cheonga-market:latest"
+      }
+      post {
+        success {
+          echo "The Docker Image Build stage successfully."
+          slackSend (color: '#0AC9FF', message: "SUCCESS: Docker Image Build SUCCESS")
+        }
+        failure {
+          echo "The Docker Image Build stage failed."
+          slackSend (color: '#FF0000', message: "FAILED: Docker Image Build FAILED")
+        }
+      }
+    }
+
+
+
+    stage('Docker Image ECR Upload'){
+      steps {
+        script{
+          docker.withRegistry("https://385722565672.dkr.ecr.ap-northeast-2.amazonaws.com/cheonga-market", "ecr:ap-northeast-2:${AWS_CREDENTIAL_NAME}") {
+                      docker.image("385722565672.dkr.ecr.ap-northeast-2.amazonaws.com/cheonga-market:${BUILD_NUMBER}").push()
+                      docker.image("385722565672.dkr.ecr.ap-northeast-2.amazonaws.com/cheonga-market:latest").push()
+                    }
+        }
+      }
+      post {
+        success {
+          echo "The deploy stage successfully."
+          slackSend (color: '#0AC9FF', message: "SUCCESS: Docker Image ECR Upload SUCCESS")
+        }
+        failure {
+          echo "The deploy stage failed."
+          slackSend (color: '#FF0000', message: "FAILED: Docker Image ECR Upload FAILED")
+        }
+      }
+    }
+
+    stage('Kubernetes Manifest Update') {
+      steps {
+        git credentialsId: githubCredential,
+            url: 'https://git-codecommit.ap-northeast-2.amazonaws.com/v1/repos/CheongA_Market',
+            branch: 'master'  
+
+        // 이미지 태그 변경 후 메인 브랜치에 push
+        sh "git config --global user.email ${gitEmail}"
+        sh "git config --global user.name ${gitName}"
+        sh "sed -i 's/cheonga-market:.*/cheonga-market:${currentBuild.number}/g' argocd/values.yaml"
+        sh "git add ."
+        sh "git commit -m 'fix:cheonga-market ${currentBuild.number} image versioning'"
+        sh "git branch -M master"
+        sh "git remote remove origin"
+        sh "git remote add origin ssh://git-codecommit.ap-northeast-2.amazonaws.com/v1/repos/CheongA_Market"
+        sh "git checkout master"
+        sh "git push -u origin master"
+      }
+      post {
+        failure {
+          echo 'Kubernetes Manifest Update failure'
+          slackSend (color: '#FF0000', message: "FAILED: Kubernetes Manifest Update '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+         }
+        success {
+          echo 'Kubernetes Manifest Update success'
+          slackSend (color: '#0AC9FF', message: "SUCCESS: Kubernetes Manifest Update '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+          }
+      }
+    }
+  }
+}
+```
+
 ![Market](./images/Market.png)
 
 키 페어의 경우
