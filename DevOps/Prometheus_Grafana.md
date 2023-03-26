@@ -54,6 +54,11 @@ helm install prometheus -f my-vaules.yaml . -n monitoring
 
 ![Prometheus_Grafana](../images/Prometheus_Grafana_3.png)
 
+** https://raw.githubusercontent.com/kubernetes/website/master/content/en/examples/pods/storage/pv-volume.yaml
+
+클러스터에 사용 가능한 스토리지 클래스가 있는지 확인을 우선 해야한다. 스토리지 클래스가 없다면 PVC를 생성할 수 없다.
+따라서, `kubectl get storageclass` 를 통해 상기 이미지와 동일한 storageclass를 사전에 생성해야 한다.
+
 위와 같이 배포 완료
 
 혹은 간단하게 테스트를 하기 위함이라면,
