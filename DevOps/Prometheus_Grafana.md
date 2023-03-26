@@ -59,6 +59,15 @@ helm install prometheus -f my-vaules.yaml . -n monitoring
 클러스터에 사용 가능한 스토리지 클래스가 있는지 확인을 우선 해야한다. 스토리지 클래스가 없다면 PVC를 생성할 수 없다.
 따라서, `kubectl get storageclass` 를 통해 상기 이미지와 동일한 storageclass를 사전에 생성해야 한다.
 
+** 클러스터 내 Pod끼리 디스크를 공유해야하는 경우 PV를 사용하며, NFS를 구성하여 노드끼리 디스크를 공유하도록 설정을 하기와 같이 한다.
+```bash
+sudo apt install nfs-common nfs-kernel-server portmap
+mkdir /nfs -p
+chmod 777 /nfs/
+sudo vi /etc/exports
+/nfs       192.168.100.101(rw,sync,no_subtree_check) 192.168.100.102(rw,sync,no_subtree_check)
+```
+
 위와 같이 배포 완료
 
 혹은 간단하게 테스트를 하기 위함이라면,
