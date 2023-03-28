@@ -205,4 +205,88 @@ ssh git-codecommit.ap-northeast-2.amazonaws.com
 
 다음과 같이 성공을 확인할 수 있다.
 
-![Slack](../images/Slack_03_.png)
+![Slack](../images/Slack_03.png)
+
+## Jenkins Node
+
+Jenkins Pipeline을 다루기 전에, Jenkins 안에서 DOOD(Docker Out Of Docker)로 Docker Agent를 실행하는 방법을 다루겠다.
+필요한 라이브러리를 직접 설치하거나 하지 않고 Jenkins Pipeline 스크립트 안에서 Docker Agent를 이용해 설치하려면 별도로 의존성있는 라이브러리를 직접 설치하지 않아도 되고, Jenkins에서 Docker image를 빌드할 때도 필요하다.
+
+Docker 안에 Docker를 띄우는 것이긴 하지만 DID(Docker In Docker) 방식처럼 독립적으로 띄우지는 않을 것이고, Host Docker의 docker.sock을 공유해서 DOOD 방식으로 띄울 것이다. DID는 존재하지만 권장하는 방법이 아니다.
+
+Jenkins에서 Docker 빌드를 위한 Agent를 사용하면 Jenkins Master와 Agent를 분리하여 Docker/Kubernetes 안에서 Agent를 실행할 수 있습니다. 이렇게 하면 Docker 빌드를 위해 필요한 자원을 관리하기 쉬워지고, Kubernetes를 사용하여 작업을 더 효율적으로 관리할 수 있다.
+
+그렇다고, DOOD가 단점이 없는 것은 아니다. Jenkins container 내부에서 `docker ps` 명령을 보내면 자기 자신의 container가 떠있는 것이 목록에 보인다. 즉, 외부 호스트 Docker에 올라와있는 container에 접근이 가능하게 될 수도 있다는 뜻이다. 또한 docker.sock을 공유하기 위해 그만큼의 권한을 Docker container에게 제공해야 한다.
+
+공식 Jenkins 이미지 안에는 Docker Engine이 설치되어 있지 않기 때문에 Docker Engine이 설치되어 있는 Jenkins가 필요하기 때문에 커스텀하여 이미지를 다시 생성해야 한다.
+
+`docker_install.sh`
+``` bash
+#!/bin/sh
+apt-get update && \
+apt-get -y install apt-transport-https \
+     ca-certificates \
+     curl \
+     gnupg2 \
+     zip \
+     unzip \
+     software-properties-common && \
+curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+   $(lsb_release -cs) \
+   stable" && \
+apt-get update && \
+apt-get -y install docker-ce
+```
+
+
+`Dockerfile`
+```
+#공식 젠킨스 이미지를 베이스로 한다.
+FROM jenkins/jenkins:lts
+
+#root 계정으로 변경(for docker install)
+USER root
+
+#DIND(docker in docker)를 위해 docker 안에서 docker를 설치
+COPY docker_install.sh /docker_install.sh
+RUN chmod +x /docker_install.sh
+RUN /docker_install.sh
+
+RUN usermod -aG docker jenkins
+USER jenkins
+```
+
+그 다음 Jenkins를 띄울 서버에 방금 만든 이미지로 Jenkins를 띄운다.
+
+``` bash
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
+        -v /home/deploy/jenkins_v:/var/jenkins_home \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        ddung1203/jenkins-dind:latest
+```
+> Host 시스템의 포트 50000에 매핑
+> JNLP 기반 Jenkins 에이전트를 하나 이상의 다른 기계에 설치한 경우 필요
+> JNLP 기반 Jenkins 에이전트는 기본적으로 50000 포트를 통해 Jenkins 마스터와 통신을 한다. 글로벌 보안 구성 페이지를 통해 Jenkins 마스터에서 이 포트 번호를 변경할 수 있음
+
+중요한 것은 Host의 docker.sock을 공유해서 사용할 것임으로 Volume Mount가 필요하다.
+
+
+``` bash
+> docker exec -it jenkins bash
+
+jenkins@20ff53d54e94:/$ docker ps
+CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                                              NAMES
+20ff53d54e94        ddung1203/jenkins-dind:latest   "/sbin/tini -- /usr/…"   35 minutes ago      Up 35 minutes       0.0.0.0:8080->8080/tcp, 0.0.0.0:50000->50000/tcp   jenkins
+```
+
+docker.sock Volume Mount에 관해 permission denied가 발생한다면 하기와 같이 Host에서 docker.sock에 접근할 수 있는 권한을 부여한다.
+
+``` bash
+# docker.sock 접근 권한
+sudo chmod 666 /var/run/docker.sock
+
+sudo groupadd docker
+sudo usermod -aG docker deploy
+```
