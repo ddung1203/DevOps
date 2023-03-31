@@ -103,14 +103,14 @@ Swarm initialized: current node (6jqwd7or3n9g8vjyjexut7jt7) is now a manager.
 
 To add a worker to this swarm, run the following command:
 
-    docker swarm join --token SWMTKN-1-476i0y8l257yfndlbxw4stihxouj78han28ght62iz13oostzf-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
+    docker swarm join --token SWMTKN-1-##########-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
 
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
 
 ``` bash
 > vagrant@swarm-worker1:~$ docker swarm join \
---token SWMTKN-1-476i0y8l257yfndlbxw4stihxouj78han28ght62iz13oostzf-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
+--token SWMTKN-1-##########-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
 ```
 
 ``` bash
@@ -120,4 +120,30 @@ ID                            HOSTNAME        STATUS    AVAILABILITY   MANAGER S
 aa20kzdi3karheaatz0ua1lzh     swarm-worker1   Ready     Active                          23.0.2
 sq8u1oybm5q91a8sjmdbme3tk     swarm-worker2   Ready     Active                          23.0.2
 ```
+
+``` bash
+ vagrant@jeonj:~$ docker service create \
+ --replicas 2 \
+ -p 80:3000 \
+ ddung1203/realmytrip:latest
+```
+
+해당 컨테이너가 없는 worker 노드로 접근해도 서비스에 접근할 수 있음을 확인할 수 있다.
+
+> global 서비스: 스웜 클러스터 내에서 사용할 수 있는 모든 노드에 컨테이너를 반드시 하나씩 생성한다. 따라서 글로벌 모드로 생성한 서비스는 레플리카 셋의 수를 별도로 지정하지 않는다.
+
+### Rolling Update
+
+``` bash
+docker service update \
+--image ddung1203/realmytrip:13 \
+myweb
+```
+
+롤백
+``` bash
+docker service rollback myweb
+```
+
+> 서비스를 생성할 때 `--update-delay`, `--update-parallelism`으로 10초 단위 업데이트, 업데이트 작업 개수를 지정 가능하다.
 
