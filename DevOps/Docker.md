@@ -71,3 +71,53 @@ google/cadvisor:latest
 CAdvisor는 도커 데몬의 정보를 가져올 수 있는 호스트의 모든 디렉터리를 CAdvisor 컨테이너에 볼륨으로서 마운트했기 때문이다. `/var/run`에는 도커를 로컬에서 제어하기 위한 유닉스 소켓이 있고, `/sys`에는 도커 컨테이너를 위한 cgroup 정보가 저장돼 있으며 `/var/lib/docker`에는 도커의 컨테이너, 이미지 등이 파일로 존재한다.
 
 다만, 여러 개의 호스트로 도커를 사용하고 있으며, 이를 기반으로 PaaS 같은 도커 클러스터를 구축했다면 단일 CAdvisor 컨테이너는 용도에 맞지 않다. 이를 위해서 보통은 K8s나 스웜 모드 등과 같은 오케스트레이션 툴을 설치한 뒤에 Prometheus, InfluxDB 등을 이용해 여러 호스트의 데이터를 수집하는 것이 일반적이다.
+
+## 스웜 클래식 & 도커 스웜 모드
+
+스웜 클래식과 스웜 모드는 여러 대의 도커 서버를 하나의 클러스터로 만들어 컨테이너를 생성하는 여러 기능을 제공한다.
+
+### 스웜 클래식
+여러 대의 도커 서버를 하나의 지접에서 사용하도록 단일 접근점 제공한다. `docker run`, `docker ps` 등 일반적인 도커 명령어와 도커 API로 클러스터의 서버를 제어하고 관리할 수 있는 기능을 제공한다.
+
+### 스웜 모드
+같은 컨테이너를 동시에 여러 개 생성해 필요에 따라 유동적으로 컨테이너의 수를 조절할 수 있으며, 컨테이너로의 연결을 분산하는 로드밸런싱 기능을 자체적으로 지원한다.
+
+스웜 모드는 별도의 설치 과정이 필요하지 않으며 도커 엔진 자체에 내장되어 있다.
+
+```bash
+docker info | grep Swarm
+ Swarm: inactive
+```
+
+클러스터 구성
+```
+jeonj 192.168.56.100
+swarm-worker1 192.168.56.101
+swarm-worker2 192.168.56.102
+```
+
+매니저 역할을 할 서버에서 스웜 클러스터 시작
+``` bash
+> vagrant@jeonj:~$ docker swarm init --advertise-addr 192.168.56.100
+Swarm initialized: current node (6jqwd7or3n9g8vjyjexut7jt7) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-476i0y8l257yfndlbxw4stihxouj78han28ght62iz13oostzf-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+```
+
+``` bash
+> vagrant@swarm-worker1:~$ docker swarm join \
+--token SWMTKN-1-476i0y8l257yfndlbxw4stihxouj78han28ght62iz13oostzf-34ziyz9j1gv53uhpce1jn1n54 192.168.56.100:2377
+```
+
+``` bash
+ vagrant@jeonj:~$ docker node ls                                   
+ID                            HOSTNAME        STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+6jqwd7or3n9g8vjyjexut7jt7 *   jeonj           Ready     Active         Leader           20.10.19
+aa20kzdi3karheaatz0ua1lzh     swarm-worker1   Ready     Active                          23.0.2
+sq8u1oybm5q91a8sjmdbme3tk     swarm-worker2   Ready     Active                          23.0.2
+```
+
