@@ -49,3 +49,25 @@ WORKDIR /root/
 COPY --from=builder /go/src/github.com/ddung1203/hello-world/app .
 CMD ["./app"]
 ```
+## CAdvisor
+
+CAdvisor는 구글이 만든 컨테이너 모니터링 도구로, 컨테이너로서 간단히 설치할 수 있고 컨테이너별 실시간 자원 사용량 및 도커 모니터링 정보 등을 시각화해서 보여준다. CAdvisor는 오픈소스로서 GitHub 및 DockerHub에서 배포되고 있다.
+
+``` bash
+docker run \          
+--volume=/:/roofts:ro \
+--volume=/var/run:/var/run:ro \
+--volume=/sys:/sys:ro \
+--volume=/var/lib/docker/:/var/lib/docker:ro \
+--volume=/dev/disk/:/dev/disk:ro \
+--publish=8080:8080 \
+--detach=true \
+--name=cadvisor \
+google/cadvisor:latest
+```
+
+`Subcontainers` 항목의 `/docker`를 클릭하면 도커 데몬의 정보, 컨테이너의 목록을 보여주는 페이지로 이동한다. `Subcontainers` 항목의 컨테이너 이름을 클릭하면 컨테이너의 자원 사용률도 실시간으로 확인할 수 있다.
+
+CAdvisor는 도커 데몬의 정보를 가져올 수 있는 호스트의 모든 디렉터리를 CAdvisor 컨테이너에 볼륨으로서 마운트했기 때문이다. `/var/run`에는 도커를 로컬에서 제어하기 위한 유닉스 소켓이 있고, `/sys`에는 도커 컨테이너를 위한 cgroup 정보가 저장돼 있으며 `/var/lib/docker`에는 도커의 컨테이너, 이미지 등이 파일로 존재한다.
+
+다만, 여러 개의 호스트로 도커를 사용하고 있으며, 이를 기반으로 PaaS 같은 도커 클러스터를 구축했다면 단일 CAdvisor 컨테이너는 용도에 맞지 않다. 이를 위해서 보통은 K8s나 스웜 모드 등과 같은 오케스트레이션 툴을 설치한 뒤에 Prometheus, InfluxDB 등을 이용해 여러 호스트의 데이터를 수집하는 것이 일반적이다.
