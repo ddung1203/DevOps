@@ -290,3 +290,19 @@ sudo chmod 666 /var/run/docker.sock
 sudo groupadd docker
 sudo usermod -aG docker deploy
 ```
+
+## Kubernetes 연동을 통한 Jenkins Agent 관리
+
+Jenkins에서는 보통 Jenkins Master와 Agent를 분리해서 Job을 처리하는 경우가 많은데, 이런 경우 Agent를 수동으로 설정하지 않고, Jenkins의 Kubernetes 플러그인을 연동해서 Kubernetes 클러스터를 통해 필요할 때만 동적으로 Agent Pod를 생성/사용되게 할 수 있다.
+
+`Manage Jenkins -> Manage Nodes and Clouds -> Configure Clouds` 에서 하기 그림과 같이 설정한다.
+
+![Jenkins](../images/Jenkins_1.png)
+
+Test Connection으로 정상 작동을 확인한다.
+
+만약 외부 Jenkins에서 Kubernetes 클러스터를 연동하려면 별도의 Credential 설정이 필요하다.
+
+즉, 내부 Jenkins에서 Kubernetes 클러스터를 연동 시 별도의 Credential이 필요없다.
+
+WIP
