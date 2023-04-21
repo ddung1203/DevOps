@@ -305,9 +305,12 @@ Test Connection으로 정상 작동을 확인한다.
 
 즉, Kubernetes 클러스터 내부 Jenkins에서 연동 시 별도의 Credential이 필요없다.
 
-![Jenkins](../images/Jenkins_2.png)
-
-> Jenkins tunnel 주소에 `http://` 접두사를 추가한 경우 오류가 발생한다.
-> https://stackoverflow.com/questions/71508629/unresolvedaddressexception-when-connecting-jnlp-slave-to-jenkins-master
+> ![Jenkins](../images/Jenkins_3.png)
+> 
+> Jenkins tunnel 주소에 `http://` 접두사를 추가한 경우 상기와 같이 오류가 발생한다. 따라서 하기와 같이 `host:port` 형식이어야 한다.
+> 
+> ![Jenkins](../images/Jenkins_2.png)
+> 
+> 참고: [StackOverflow](https://stackoverflow.com/questions/71508629/unresolvedaddressexception-when-connecting-jnlp-slave-to-jenkins-master)
 
 WIP
