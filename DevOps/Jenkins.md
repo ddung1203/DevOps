@@ -301,8 +301,13 @@ Jenkins에서는 보통 Jenkins Master와 Agent를 분리해서 Job을 처리하
 
 Test Connection으로 정상 작동을 확인한다.
 
-만약 외부 Jenkins에서 Kubernetes 클러스터를 연동하려면 별도의 Credential 설정이 필요하다.
+만약 외부 Jenkins에서 Kubernetes 클러스터를 연동하려면 상기 그림과 같이 별도의 Credential 설정이 필요하다.
 
-즉, 내부 Jenkins에서 Kubernetes 클러스터를 연동 시 별도의 Credential이 필요없다.
+즉, Kubernetes 클러스터 내부 Jenkins에서 연동 시 별도의 Credential이 필요없다.
+
+![Jenkins](../images/Jenkins_2.png)
+
+> Jenkins tunnel 주소에 `http://` 접두사를 추가한 경우 오류가 발생한다.
+> https://stackoverflow.com/questions/71508629/unresolvedaddressexception-when-connecting-jnlp-slave-to-jenkins-master
 
 WIP
