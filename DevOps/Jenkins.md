@@ -313,4 +313,49 @@ Test Connection으로 정상 작동을 확인한다.
 > 
 > 참고: [StackOverflow](https://stackoverflow.com/questions/71508629/unresolvedaddressexception-when-connecting-jnlp-slave-to-jenkins-master)
 
-WIP
+### Sample Pipeline
+
+``` Groovy
+podTemplate(containers: [
+  containerTemplate(name: 'maven', image: 'maven:3.8.1-jdk-8', command: 'sleep', args: '99d'),
+  containerTemplate(name: 'golang', image: 'golang:1.16.5', command: 'sleep', args: '99d')
+ ]) {
+
+  node(POD_LABEL) {
+    stage('Get a Maven project') {
+      git 'https://github.com/jenkinsci/kubernetes-plugin.git'
+      container('maven') {
+        stage('Build a Maven project') {
+          sh 'mvn -B -ntp clean install'
+        }
+      }
+    }
+
+    stage('Get a Golang project') {
+      git url: 'https://github.com/hashicorp/terraform.git', branch: 'main'
+      container('golang') {
+        stage('Build a Go project') {
+          sh '''
+          mkdir -p /go/src/github.com/hashicorp
+          ln -s `pwd` /go/src/github.com/hashicorp/terraform
+          cd /go/src/github.com/hashicorp/terraform && make
+          '''
+        }
+      }
+    }
+  }
+}
+```
+
+![Jenkins](../images/Jenkins_4.png)
+
+kubectl로 Pod를 보면 파이프라인을 수행하기 전에 빌드를 수행할 Pod의 내용을 확인할 수 있으며 샘플 스크립트에서 정의한 PodTemplate에 jnlp 컨테이너가 자동으로 추가된 것을 확인할 수 있다.
+
+jnlp 컨테이너에 jenkins agent가 실행되고 jenkins master와 통신하는 역할을 하는데 플러그인이 자동으로 Pod에 추가한 것이다.
+
+![Jenkins](../images/Jenkins_5.png)
+
+샘플 Pipeline 스크립트를 통해 정상적으로 작동되는 것을 확인이 가능하다.
+
+
+
