@@ -367,7 +367,41 @@ Jenkins 시스템 설정에서 Kubernetes plugin을 설정했던 페이지에 Po
 
 그 외 Pod 설정에, 특정 Node에서 작동하게 하려면 nodeSelector, env, hostPath volume 등 Kubernetes Pod에 필요한 기존 정보들을 대부분 설정할 수 있다. 특히 Labels 같은 경우 pipeline 스크립트에서 쓸 노드를 명시할 때 쓰이므로 유니크한 이름으로 지정해야 한다.
 
-위 예시에서는 하나의 Pod에 `ubuntu`라는 컨테이너가 ubuntu 이미지를 사용하게 설정하였습니다.
+위 예시에서는 하나의 Pod에 `ubuntu`라는 컨테이너가 ubuntu 이미지를 사용하게 설정하였다.
 
 이렇게 Global Pod template을 한 번 정의해 두면 나중에 스크립트에서 이 template을 상속하여 merge 하거나 overwrite 할 수도 있다.
 
+``` Groovy
+pipeline {
+    agent {
+        node {
+            label 'test'
+        }
+    }
+    
+    stages {
+        stage('Build') {
+            parallel {
+                stage('Build ubuntu-1 container') {
+                    steps {
+                        container('ubuntu-1') {
+                            sh "echo hello from $POD_CONTAINER"
+                        }
+                    }
+                }
+                stage('Build ubuntu-2 container') {
+                    steps {
+                        container('ubuntu-2') {
+                            sh "echo hello from $POD_CONTAINER"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Build stage에서 Agent를 생성해 Stage의 컨테이너에서 병렬로 수행하게 하는 예제이다. 하기와 같이 각 컨테이너에서 echo 명령을 실행 후 종료된다.
+
+![Jenkins](../images/Jenkins_7.png)
