@@ -357,5 +357,17 @@ jnlp 컨테이너에 jenkins agent가 실행되고 jenkins master와 통신하�
 
 샘플 Pipeline 스크립트를 통해 정상적으로 작동되는 것을 확인이 가능하다.
 
+### Global Pod Template
 
+Jenkins 시스템 설정에서 Kubernetes plugin을 설정했던 페이지에 Pod Template을 정의할 수 있다.
+
+![Jenkins](../images/Jenkins_6.png)
+
+상기와 같이 Pod에 필요한 정보를 입력한다.
+
+그 외 Pod 설정에, 특정 Node에서 작동하게 하려면 nodeSelector, env, hostPath volume 등 Kubernetes Pod에 필요한 기존 정보들을 대부분 설정할 수 있다. 특히 Labels 같은 경우 pipeline 스크립트에서 쓸 노드를 명시할 때 쓰이므로 유니크한 이름으로 지정해야 한다.
+
+위 예시에서는 하나의 Pod에 `ubuntu`라는 컨테이너가 ubuntu 이미지를 사용하게 설정하였습니다.
+
+이렇게 Global Pod template을 한 번 정의해 두면 나중에 스크립트에서 이 template을 상속하여 merge 하거나 overwrite 할 수도 있다.
 
