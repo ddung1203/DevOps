@@ -452,9 +452,23 @@ Kubernetes의 DNS은 아래와 같다.
 
 따라서, 다른 네임스페이스에 있는 Pod에서 위의 DB를 접근하기 위해선 `mysql-0.mysql.mysql` 로 접근해야 한다.
 
-> MySQL UTF-8 설정
+> **MySQL UTF-8 설정**
 > 
+> [MySQL 한글깨짐현상 두가지 해결방법 : cmd와 Workbench, 이클립스와 MYSQL연결](https://sowon-dev.github.io/2020/07/01/200702jspi2/)
+> 
+> [MySQL character set 확인 및 변경](https://bstar36.tistory.com/307)
 
-[MySQL 한글깨짐현상 두가지 해결방법 : cmd와 Workbench, 이클립스와 MYSQL연결](https://sowon-dev.github.io/2020/07/01/200702jspi2/)
-
-[MySQL character set 확인 및 변경](https://bstar36.tistory.com/307)
+> **StatefulSet에서 Headless 서비스를 이용한 Pod discovery**
+> 
+> StatefulSet에서 DB와 같이 master/slave 구조가 있는 서비스들의 경우에는 service를 통해서 로드밸런싱을 하지 않고, 개별 Pod의 주소를 알고 접속해야 한다.
+> 
+> Pod들은 DNS 이름을 가질 수는 있으나, `{pod name}.{service name}.{namespace}.svc.cluster.local` 식으로 이름을 가지기 때문에, Pod를 DNS를 이용해서 접근하려면 service name이 있어야 한다. 그러나 StatefuleSet에 의한 서비스들은 Kubernetes Service를 이용해서 로드밸런싱을 하는 것이 아니기 때문에, 로드밸런서의 역할은 필요가 없고, 논리적으로 Pod들을 묶어줄 수 있는 Service만 있으면 되기 때문에 headless 서비스를 활용한다. Headless 서비스를 이용하면, Service가 로드 밸런서의 역할도 하지 않고, 단일 IP도 가지지 않지만, headless 서비스에 의해서 묶어진 Pod들의 이름도 알 수 있고, `{pod name}.{service name}.{namespace}.svc.cluster.local` 이름으로 각 Pod에 대한 접근 주소를 얻을 수 있다.
+> 
+> ``` bash
+>  vagrant@k8s-master > ~ > nslookup mysql-0.mysql.mysql.svc.cluster.local
+> Server:         10.233.59.181
+> Address:        10.233.59.181#53
+> 
+> Name:   mysql-0.mysql.mysql.svc.cluster.local
+> Address:    10.20.3.30
+> ```
