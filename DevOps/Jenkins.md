@@ -5,7 +5,26 @@ Jenkins는 Java로 빌드 된 CI 및 CD 도구이며, Jenkins는 기본적으로
 JDK 11 설치 (11버전 이상 필수)
 
 ```bash
+sudo apt-cache search openjdk
+```
+
+```bash
 sudo apt-get install openjdk-11-jdk
+```
+
+java path 조회
+
+```bash
+which java
+
+ls -l /usr/bin/java
+# link된 주소 재 조회
+ls -l /etc/alternatives/java
+```
+조회된 path 환경변수 추가
+
+``` bash
+/usr/lib/jvm/java-11-openjdk-amd64
 ```
 
 - Jenkins 저장소 Key 다운로드
