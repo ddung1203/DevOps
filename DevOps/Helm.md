@@ -1,5 +1,17 @@
 # Helm
 
+apt-get 및 yum이 Linux 용 패키지 매지저 인 것과 같이, Helm은 Kubernetes용 오픈소스 패키지 매니저이다.
+
+Helm Chart는 복잡한 애플리케이션의 배포를 관리한다. Chart를 매개변수화된 YAML 템플릿으로 생각하면 된다.
+
+## Helm Architecture
+
+- Helm client
+
+- Helm Server(Tiller)
+  - Kubernetes 클러스터 내에서 실행
+  - Kubernetes APIServer와 상호작용하여 K8s 리소스를 설치, 업그레이드, 쿼리, 삭제한다.
+
 ## Helm 설치
 
 최신 릴리즈 다운로드 후 설치
@@ -57,46 +69,46 @@ canary 배포에 대해선 배포 전략에서 다루겠다.
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: {{ .Values.app_name }}
+  name: { { .Values.app_name } }
 spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: {{ .Values.app_label }}
+      app: { { .Values.app_label } }
   template:
     metadata:
       labels:
-        app: {{ .Values.app_label }}
+        app: { { .Values.app_label } }
     spec:
       containers:
-      - name: {{ .Values.app_name }}
-        image: {{ .Values.app_image }}
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: "800m"
-            memory: "800M"
-          limits:
-            cpu: "800m"
-            memory: "800M"
+        - name: { { .Values.app_name } }
+          image: { { .Values.app_image } }
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "800m"
+              memory: "800M"
+            limits:
+              cpu: "800m"
+              memory: "800M"
   strategy:
     canary:
       maxSurge: "25%"
       maxUnavailable: 0
       steps:
-      - setWeight: 25
-      - pause: { duration: 10m }
+        - setWeight: 25
+        - pause: { duration: 10m }
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app_name }}
+  name: { { .Values.app_name } }
 spec:
   type: LoadBalancer
   selector:
-    app: {{ .Values.app_label }}
+    app: { { .Values.app_label } }
   ports:
     - port: 80
       targetPort: 8080
@@ -104,12 +116,12 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.app_name }}
+  name: { { .Values.app_name } }
 spec:
   scaleTargetRef:
     apiVersion: argoproj.io/v1alpha1
     kind: Rollout
-    name: {{ .Values.app_name }}
+    name: { { .Values.app_name } }
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 50
