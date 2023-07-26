@@ -2,6 +2,8 @@
 
 ArgoCD는 GitOps 방식으로 관리되는 Manifest 파일의 변경사항을 감시하며, 현재 배포된 환경의 상태와 Github Manifest 파일에 정의된 상태를 동일하게 유지하는 역할을 수행한다.
 
+GitOps는 소스 저장소를 애플리케이션을 위한 정보의 원칙으로 사용하는 방법론이다. 코드와 구성정보를 저장소에 저장하게 된다. 여기선, k8s의 메니페스트와 yaml 파일이 된다.
+
 ## ArgoCD 설치
 
 `argocd` namespace 생성 및 배포
