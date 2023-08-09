@@ -21,9 +21,10 @@ ls -l /usr/bin/java
 # link된 주소 재 조회
 ls -l /etc/alternatives/java
 ```
+
 조회된 path 환경변수 추가
 
-``` bash
+```bash
 /usr/lib/jvm/java-11-openjdk-amd64
 ```
 
@@ -72,7 +73,7 @@ sudo service jenkins restart
 pipeline {
   agent any
 
-  environment{
+  environment {
     githubCredential='<깃헙 크리덴셜>'
     AWS_CREDENTIAL_NAME='<AWS 크리덴셜>'
     gitEmail='ddung1203@gsneotek.com'
@@ -86,11 +87,11 @@ pipeline {
       }
       post {
         failure {
-          echo 'Repository Clone Failure' 
+          echo 'Repository Clone Failure'
           slackSend (color: '#FF0000', message: "FAILED: Repository Clone Failure")
         }
         success {
-          echo 'Repository Clone Success' 
+          echo 'Repository Clone Success'
           slackSend (color: '#0AC9FF', message: "SUCCESS: Repository Clone Success")
         }
       }
@@ -102,16 +103,16 @@ pipeline {
       }
       post {
         failure {
-          echo 'MVN Build Failure' 
+          echo 'MVN Build Failure'
           slackSend (color: '#FF0000', message: "FAILED: MVN Build Failure")
         }
         success {
-          echo 'MVN Build Success' 
+          echo 'MVN Build Success'
           slackSend (color: '#0AC9FF', message: "SUCCESS: MVN Build Success")
         }
       }
     }
-    
+
     stage('Docker Image Build') {
       steps{
         sh "docker build -t cheonga-market ."
@@ -155,7 +156,7 @@ pipeline {
       steps {
         git credentialsId: githubCredential,
             url: '<깃 주소>',
-            branch: 'master'  
+            branch: 'master'
 
         // 이미지 태그 변경 후 메인 브랜치에 push
         sh "git config --global user.email ${gitEmail}"
@@ -173,11 +174,11 @@ pipeline {
         failure {
           echo 'Kubernetes Manifest Update failure'
           slackSend (color: '#FF0000', message: "FAILED: Kubernetes Manifest Update '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-         }
+        }
         success {
           echo 'Kubernetes Manifest Update success'
           slackSend (color: '#0AC9FF', message: "SUCCESS: Kubernetes Manifest Update '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-          }
+        }
       }
     }
   }
@@ -240,7 +241,8 @@ Jenkins에서 Docker 빌드를 위한 Agent를 사용하면 Jenkins Master와 Ag
 공식 Jenkins 이미지 안에는 Docker Engine이 설치되어 있지 않기 때문에 Docker Engine이 설치되어 있는 Jenkins가 필요하기 때문에 커스텀하여 이미지를 다시 생성해야 한다.
 
 `docker_install.sh`
-``` bash
+
+```bash
 #!/bin/sh
 apt-get update && \
 apt-get -y install apt-transport-https \
@@ -259,8 +261,8 @@ apt-get update && \
 apt-get -y install docker-ce
 ```
 
-
 `Dockerfile`
+
 ```
 #공식 젠킨스 이미지를 베이스로 한다.
 FROM jenkins/jenkins:lts
@@ -279,20 +281,20 @@ USER jenkins
 
 그 다음 Jenkins를 띄울 서버에 방금 만든 이미지로 Jenkins를 띄운다.
 
-``` bash
+```bash
 docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
         -v /home/deploy/jenkins_v:/var/jenkins_home \
         -v /var/run/docker.sock:/var/run/docker.sock \
         ddung1203/jenkins-dind:latest
 ```
+
 > Host 시스템의 포트 50000에 매핑
 > JNLP 기반 Jenkins 에이전트를 하나 이상의 다른 기계에 설치한 경우 필요
 > JNLP 기반 Jenkins 에이전트는 기본적으로 50000 포트를 통해 Jenkins 마스터와 통신을 한다. 글로벌 보안 구성 페이지를 통해 Jenkins 마스터에서 이 포트 번호를 변경할 수 있음
 
 중요한 것은 Host의 docker.sock을 공유해서 사용할 것임으로 Volume Mount가 필요하다.
 
-
-``` bash
+```bash
 > docker exec -it jenkins bash
 
 jenkins@20ff53d54e94:/$ docker ps
@@ -302,7 +304,7 @@ CONTAINER ID        IMAGE                         COMMAND                  CREAT
 
 docker.sock Volume Mount에 관해 permission denied가 발생한다면 하기와 같이 Host에서 docker.sock에 접근할 수 있는 권한을 부여한다.
 
-``` bash
+```bash
 # docker.sock 접근 권한
 sudo chmod 666 /var/run/docker.sock
 
@@ -325,16 +327,16 @@ Test Connection으로 정상 작동을 확인한다.
 즉, Kubernetes 클러스터 내부 Jenkins에서 연동 시 별도의 Credential이 필요없다.
 
 > ![Jenkins](../images/Jenkins_3.png)
-> 
+>
 > Jenkins tunnel 주소에 `http://` 접두사를 추가한 경우 상기와 같이 오류가 발생한다. 따라서 하기와 같이 `host:port` 형식이어야 한다.
-> 
+>
 > ![Jenkins](../images/Jenkins_2.png)
-> 
+>
 > 참고: [StackOverflow](https://stackoverflow.com/questions/71508629/unresolvedaddressexception-when-connecting-jnlp-slave-to-jenkins-master)
 
 ### Sample Pipeline
 
-``` Groovy
+```Groovy
 podTemplate(containers: [
   containerTemplate(name: 'maven', image: 'maven:3.8.1-jdk-8', command: 'sleep', args: '99d'),
   containerTemplate(name: 'golang', image: 'golang:1.16.5', command: 'sleep', args: '99d')
@@ -390,37 +392,58 @@ Jenkins 시스템 설정에서 Kubernetes plugin을 설정했던 페이지에 Po
 
 이렇게 Global Pod template을 한 번 정의해 두면 나중에 스크립트에서 이 template을 상속하여 merge 하거나 overwrite 할 수도 있다.
 
-``` Groovy
+```Groovy
 pipeline {
-    agent {
-        node {
-            label 'test'
-        }
+  agent {
+    node {
+      label 'test'
     }
-    
-    stages {
-        stage('Build') {
-            parallel {
-                stage('Build ubuntu-1 container') {
-                    steps {
-                        container('ubuntu-1') {
-                            sh "echo hello from $POD_CONTAINER"
-                        }
-                    }
-                }
-                stage('Build ubuntu-2 container') {
-                    steps {
-                        container('ubuntu-2') {
-                            sh "echo hello from $POD_CONTAINER"
-                        }
-                    }
-                }
+  }
+
+  stages {
+    stage('Build') {
+      parallel {
+        stage('Build ubuntu-1 container') {
+          steps {
+            container('ubuntu-1') {
+              sh "echo hello from $POD_CONTAINER"
             }
+          }
         }
+        stage('Build ubuntu-2 container') {
+          steps {
+            container('ubuntu-2') {
+              sh "echo hello from $POD_CONTAINER"
+            }
+          }
+        }
+      }
     }
+  }
 }
 ```
 
 Build stage에서 Agent를 생성해 Stage의 컨테이너에서 병렬로 수행하게 하는 예제이다. 하기와 같이 각 컨테이너에서 echo 명령을 실행 후 종료된다.
 
 ![Jenkins](../images/Jenkins_7.png)
+
+## Jenkins Helm Charts
+
+Jenkins의 볼륨 유지와 백업 관리를 위해 Jenkins Helm chart를 이용하여 빠른 구성과 테스트를 진행한다.
+
+helm repo
+
+```bash
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+```
+
+helm value
+
+```bash
+helm show values jenkins/jenkins > jenkins-values.yaml
+```
+
+`controller.adminPassword`, `controller.serviceType`, `controller.agentListenerServiceType`, `persistence.storageClass` 구성 변경
+
+[Jenkins Value 참고](https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md)
