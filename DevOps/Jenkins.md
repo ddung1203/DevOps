@@ -221,6 +221,8 @@ ssh git-codecommit.ap-northeast-2.amazonaws.com
 
 이후 토큰이 발급되면 Jenkins 내에서 아래와 같이 등록을 끝마친다.
 
+Credential의 경우 `Secret text`으로 선택 후, `Secret`에 Slack Token을, `ID`엔 Jenkins에서 사용할 ID를 입력한다.
+
 ![Slack](../images/Slack_02.png)
 
 다음과 같이 성공을 확인할 수 있다.
@@ -447,3 +449,9 @@ helm show values jenkins/jenkins > jenkins-values.yaml
 `controller.adminPassword`, `controller.serviceType`, `controller.agentListenerServiceType`, `persistence.storageClass` 구성 변경
 
 [Jenkins Value 참고](https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md)
+
+클러스터에 배포할 수 있도록 Jenkins 서비스 계정 구성
+
+```bash
+kubectl create clusterrolebinding jenkins-deploy --clusterrole=cluster-admin --serviceaccount=default:cd-jenkins
+```
