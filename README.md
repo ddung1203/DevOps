@@ -41,3 +41,5 @@
 [다중 개발자를 위한 공용 클러스터 구축](https://github.com/ddung1203/TIL/blob/main/k8s/05_Namespace.md#%EB%8B%A4%EC%A4%91-%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EA%B3%B5%EC%9A%A9-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EA%B5%AC%EC%B6%95)
 
 [Kubernetes state metrics](./DevOps/Kube_state_metrics.md)
+
+[Pod에서 imagePullSecrets 설정](./DevOps/imagePullSecrets.md)
