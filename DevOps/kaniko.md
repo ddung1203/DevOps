@@ -1,10 +1,12 @@
 # Kaniko
 
+일반적으로 containerd가 설치된 환경에서 Image를 빌드하지만, 서비스 레이어에서 사용자가 Image를 빌드하는 경우가 생긴다. 일반적으로 VM이나 서버를 따로 구축해 Container runtime만 설치하여 빌드 서버로 사용한다. 현재까지 본인은 docker를 설치한 서버를 따로 구축을 하거나, `cloud build` 등을 활용해왔다.
+
 Kaniko는 오픈소스 프로젝트로, Docker Image 형태로 제공된다.
 
 https://github.com/GoogleContainerTools/kaniko
 
-Kubernetes에 Pod로 Docker만을 설치해 빌드용 컨테이너를 만들어 리소스를 할당하게 되는 경우(DinD), 보안적 이슈로 권장을 하지 않는다.
+허나, Kubernetes Pod 내 Docker만을 설치해 빌드용 컨테이너를 만들어 리소스를 할당하게 되는 경우(DinD), 보안적 이슈로 권장을 하지 않는다.
 
 하지만, Kaniko는 내부에서 Docker Daemon 없이 Dockerfile을 빌드할 수 있는 엔진이 구현되어 있므여 이로 인해 클러스터 내에서도 권한 문제 없이 안전하고 빠르게 Docker Build를 수행할 수 있다.
 
