@@ -45,3 +45,5 @@
 [Pod에서 imagePullSecrets 설정](./DevOps/imagePullSecrets.md)
 
 [Docker 없이 Docker Image Build 및 Push - Kaniko](./DevOps/kaniko.md)
+
+[Kubernetes 내 Jenkins Agent를 활용한 이미지 배포 및 모니터링](https://github.com/ddung1203/youtube-jenkins)
