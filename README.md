@@ -49,3 +49,5 @@
 [Kubernetes 내 Jenkins Agent를 활용한 이미지 배포 및 모니터링](https://github.com/ddung1203/youtube-jenkins)
 
 [PodDisruptionBudget](./DevOps/PodDisruptionBudget.md)
+
+[Prometheus를 사용한 Jenkins 모니터링](https://github.com/ddung1203/youtube-jenkins#prometheus%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%9C-jenkins-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81)
