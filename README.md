@@ -30,6 +30,8 @@
 
 [Loki Logging System](./DevOps/Loki_Logging_System.md)
 
+[EFK Stack](./DevOps/efk.yaml)
+
 [Run a Stateful Application - MySQL](./DevOps/Run_a_Stateful_Application_-_MySQL.md)
 
 [사용된 WAS](./Market.md)
