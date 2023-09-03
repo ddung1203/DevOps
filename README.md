@@ -30,7 +30,7 @@
 
 [Loki Logging System](./DevOps/Loki_Logging_System.md)
 
-[EFK Stack](./DevOps/efk.yaml)
+[EFK Stack](./DevOps/eck.md)
 
 [Run a Stateful Application - MySQL](./DevOps/Run_a_Stateful_Application_-_MySQL.md)
 
