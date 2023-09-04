@@ -350,8 +350,8 @@ fileConfigs:
       <filter kubernetes.var.log.containers.**>
         @type grep
         <exclude>
-          key message
-          pattern kube-probe
+          key log
+          pattern /kube\-probe/
         </exclude>
       </filter>
 
@@ -386,7 +386,7 @@ fileConfigs:
     <label @OUTPUT>
       <match **>
         @type elasticsearch
-        hosts "http://elastic:${PASSWORD}@elasticsearch-es-default.elastic.svc.cluster.local:9200"
+        hosts "http://elastic:RQsTBU4L253I6UYx533Vot43@elasticsearch-es-default.elastic.svc.cluster.local:9200"
         # port 9200
         # path ""
         # user elastic
