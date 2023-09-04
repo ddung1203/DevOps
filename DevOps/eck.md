@@ -236,6 +236,22 @@ YouTube의 프로젝트는 Liveness Probe를 사용하여 컨테이너의 상태
 
 상기와 같은 경우, `kube-probe`를 포함하지 않는 `message`의 값을 만족하는 경우를 뜻한다.
 
+이와 동일하게, Kubernetes 엔진이나, EFK의 Pod들의 로그는 수집할 필요가 없으므로 제외하기 위해 하기와 같이 작성한다.
+
+```conf
+path /var/log/containers/*.log
+exclude_path [
+  "/var/log/containers/fluent*",
+  "/var/log/containers/ingress*", 
+  "/var/log/containers/elasticsearch*", 
+  "/var/log/containers/kibana*", 
+  "/var/log/containers/kube*", 
+  "/var/log/containers/calico*", 
+  "/var/log/containers/tigera*", 
+  "/var/log/containers/nfs-client*"
+]
+```
+
 
 ## KQL - Kibana Query Language
 
