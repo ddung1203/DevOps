@@ -236,3 +236,21 @@ YouTube의 프로젝트는 Liveness Probe를 사용하여 컨테이너의 상태
 
 상기와 같은 경우, `kube-probe`를 포함하지 않는 `message`의 값을 만족하는 경우를 뜻한다.
 
+
+## KQL - Kibana Query Language
+
+KQL은 데이터 필터링을 위한 텍스트 기반 쿼리 언어이다.
+
+- Field query
+- Nested field query
+- Boolean query
+- Range query
+- Exist query
+- Wildcard query
+
+https://www.elastic.co/guide/en/kibana/current/kuery-query.html
+
+![EFK](../images/EFK_1.png)
+
+상기와 같은 경우, 특정 IP로 [YouTube Service](https://github.com/ddung1203/youtube-jenkins)를 이용한 경우를 조회한다.
+
