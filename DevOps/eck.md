@@ -211,3 +211,28 @@ volumeMounts:
 > probe endpoint는 항상 실행되어야 하는 prometheus server에 의해 활성화 된다. 만약, `configMapConfigs: fluentd-prometheus-conf`를 작성하지 않았을 경우 Pod가 Readiness Probe로 인해 종료되는 것을 확인할 수 있다.
 > 
 > [Git Issue 참고](https://github.com/fluent/helm-charts/issues/84#issuecomment-801792696)
+
+## Filter Liveness Probe Log
+
+YouTube의 프로젝트는 Liveness Probe를 사용하여 컨테이너의 상태를 주기적으로 체크해서, 응답이 없으면 컨테이너를 자동으로 재시작한다.
+
+이 예제를 통해 filter를 추가하고, grep을 사용하겠다.
+
+```js
+::ffff:10.0.2.15 - - [Sun, 03 Sep 2023 10:31:34 GMT] "GET /health-check HTTP/1.1" 200 19 "-" "kube-probe/1.26"
+```
+
+`grep`을 사용하여 특정 필드의 값에 의한 이벤트를 감지한다.
+
+```conf
+      <filter kubernetes.var.log.containers.**>
+        @type grep
+        <exclude>
+          key message
+          pattern kube-probe
+        </exclude>
+      </filter>
+```
+
+상기와 같은 경우, `kube-probe`를 포함하지 않는 `message`의 값을 만족하는 경우를 뜻한다.
+

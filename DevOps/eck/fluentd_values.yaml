@@ -314,13 +314,13 @@ fileConfigs:
           time_key time
           time_type string
           time_format "%Y-%m-%dT%H:%M:%S.%NZ"
-          keep_time_key false
+          keep_time_key true
         </pattern>
         <pattern>
           format regexp
           expression /^(?<time>.+) (?<stream>stdout|stderr)( (.))? (?<log>.*)$/
           time_format '%Y-%m-%dT%H:%M:%S.%NZ'
-          keep_time_key false
+          keep_time_key true
         </pattern>
       </parse>
       emit_unmatched_lines true
@@ -345,6 +345,14 @@ fileConfigs:
         skip_container_metadata false
         skip_namespace_metadata true
         skip_master_url true
+      </filter>
+
+      <filter kubernetes.var.log.containers.**>
+        @type grep
+        <exclude>
+          key message
+          pattern kube-probe
+        </exclude>
       </filter>
 
       <match **>
