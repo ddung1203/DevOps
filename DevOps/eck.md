@@ -1,5 +1,17 @@
 # ECK
 
+목차
+
+1. [Feature](#feature)
+2. [Download ECK(Elastic Cloud on Kubernetes)](#download-eckelastic-cloud-on-kubernetes)
+3. [Deploy an Elasticsearch cluster](#deploy-an-elasticsearch-cluster)
+4. [Deploy a Kibana instance](#deploy-a-kibana-instance)
+5. [Deploy a Fluentd using Helm Chart](#deploy-a-fluentd-using-helm-chart)
+6. [Filter Liveness Probe Log](#filter-liveness-probe-log)
+7. [KQL - Kibana Query Language](#kql---kibana-query-language)
+8. [Deliver Git Commit log](#deliver-git-commit-log)
+
+
 ECK란, Elasticsearch와 Kibana를 Kubernetes 환경에서 배포하고 관리하기 위한 오픈소스 프로젝트이다.
 
 > **EFK**는 Elasticsearch, Fluentd, Kibana 스택을 의미한다. 기존의 ELK의 Logstash를 Fluentd로 대체한 것이다.
@@ -300,7 +312,7 @@ curl -X POST -d "{\"commit_message\": \"$COMMIT_MESSAGE\", \"committer_name\": \
 chmod +x .git/hooks/post-commit
 ```
 
-> Elasticsearch에서 timestamp field로 사용할 수 있도록, 상기와 같이 date format을 마주처야 한다.
+> Elasticsearch에서 timestamp field로 사용할 수 있도록, 상기와 같이 date format을 맞춰야 한다.
 > 
 > [Mapping parameters - format](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html)
 > 
@@ -329,3 +341,8 @@ chmod +x .git/hooks/post-commit
     </match>
 ```
 
+![EFK](../images/EFK_2.png)
+
+![EFK](../images/EFK_3.png)
+
+이제, Kibana의 Dashboard를 통해 시각화가 가능하다.
