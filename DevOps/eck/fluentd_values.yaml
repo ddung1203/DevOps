@@ -213,10 +213,10 @@ service:
   annotations: {}
   # loadBalancerIP:
   # externalTrafficPolicy: Local
-  ports: []
-  # - name: "forwarder"
-  #   protocol: TCP
-  #   containerPort: 24224
+  ports:
+    - name: "fluentd-http"
+      protocol: TCP
+      containerPort: 9880
 
 ## Prometheus Monitoring
 ##
@@ -299,6 +299,14 @@ configMapConfigs:
 fileConfigs:
   01_sources.conf: |-
     ## logs from podman
+    <source>
+      @type http
+      port 9880
+      bind 0.0.0.0
+      <parse>
+        @type json
+      </parse>
+    </source>
     <source>
       @type tail
       @id in_tail_container_logs
@@ -393,3 +401,8 @@ fileConfigs:
         # password ${PASSWORD}
       </match>
     </label>
+    <match devops-commit.*>
+      @type elasticsearch
+      hosts "http://elastic:RQsTBU4L253I6UYx533Vot43@elasticsearch-es-default.elastic.svc.cluster.local:9200"
+      index_name devops-commit
+    </match>

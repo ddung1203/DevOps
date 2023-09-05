@@ -270,3 +270,62 @@ https://www.elastic.co/guide/en/kibana/current/kuery-query.html
 
 상기와 같은 경우, 특정 IP로 [YouTube Service](https://github.com/ddung1203/youtube-jenkins)를 이용한 경우를 조회한다.
 
+## Deliver Git Commit log
+
+Git 커밋 로그를 Fluentd로 전송하기 위해, 커밋 이벤트를 감지하고 Fluentd에 전달하도록 한다.
+
+### Shell Script
+
+`.git/hooks/post-commit`
+```bash
+#!/bin/sh
+
+# Git 커밋 메시지, 커밋한 사람, 커밋한 사람의 이메일, 커밋한 날짜, 커밋 해시를 변수에 저장
+COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s") 
+COMMITTER_NAME=$(git log -1 --pretty=format:"%cn") 
+COMMITTER_EMAIL=$(git log -1 --pretty=format:"%ce") 
+COMMITTER_DATE=$(git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%dT%H:%M:%S%z") 
+COMMIT_HASH=$(git log -1 --pretty=format:"%H")
+
+# Fluentd 엔드포인트 주소를 변수에 저장
+FLUENTD_ENDPOINT='http://192.168.100.100:31312/devops-commit.log'
+
+# curl 명령어를 사용하여 Fluentd 엔드포인트로 커밋 정보를 전송
+curl -X POST -d "{\"commit_message\": \"$COMMIT_MESSAGE\", \"committer_name\": \"$COMMITTER_NAME\", \"committer_email\": \"$COMMITTER_EMAIL\", \"committer_date\": \"$COMMITTER_DATE\", \"commit_hash\": \"$COMMIT_HASH\"}" -H 'Content-Type: application/json' $FLUENTD_ENDPOINT
+```
+
+또한, 커밋 시 실행 가능하도록 파일 실행 권한을 부여한다.
+
+```bash
+chmod +x .git/hooks/post-commit
+```
+
+> Elasticsearch에서 timestamp field로 사용할 수 있도록, 상기와 같이 date format을 마주처야 한다.
+> 
+> [Mapping parameters - format](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html)
+> 
+> [Git 커밋 히스토리](https://git-scm.com/book/ko/v2/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%EC%BB%A4%EB%B0%8B-%ED%9E%88%EC%8A%A4%ED%86%A0%EB%A6%AC-%EC%A1%B0%ED%9A%8C%ED%95%98%EA%B8%B0)
+
+### Fluentd 설정
+
+[Input Plugins - http](https://docs.fluentd.org/input/http)
+
+[Output Plugins - elasticsearch](https://docs.fluentd.org/output/elasticsearch)
+
+```conf
+    <source>
+      @type http
+      port 9880
+      bind 0.0.0.0
+      <parse>
+        @type json
+      </parse>
+    </source>
+...
+    <match devops-commit.*>
+      @type elasticsearch
+      hosts "http://elastic:RQsTBU4L253I6UYx533Vot43@elasticsearch-es-default.elastic.svc.cluster.local:9200"
+      index_name devops-commit
+    </match>
+```
+
