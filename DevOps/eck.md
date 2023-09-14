@@ -11,6 +11,10 @@
 7. [KQL - Kibana Query Language](#kql---kibana-query-language)
 8. [Deliver Git Commit log](#deliver-git-commit-log)
 
+## Architecture
+
+![EFK Architecture](../images/EFK.png)
+
 
 ECK란, Elasticsearch와 Kibana를 Kubernetes 환경에서 배포하고 관리하기 위한 오픈소스 프로젝트이다.
 
