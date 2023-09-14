@@ -286,6 +286,8 @@ https://www.elastic.co/guide/en/kibana/current/kuery-query.html
 
 상기와 같은 경우, 특정 IP로 [YouTube Service](https://github.com/ddung1203/youtube-jenkins)를 이용한 경우를 조회한다.
 
+![Kibana YouTube Log](../images/Kibana_http_log.png)
+
 ## Deliver Git Commit log
 
 Git 커밋 로그를 Fluentd로 전송하기 위해, 커밋 이벤트를 감지하고 Fluentd에 전달하도록 한다.
@@ -349,4 +351,6 @@ chmod +x .git/hooks/post-commit
 
 ![EFK](../images/EFK_3.png)
 
-이제, Kibana의 Dashboard를 통해 시각화가 가능하다.
+이제 하기와 같이 Kibana의 Dashboard를 통해 시각화가 가능하다.
+
+![Kibana git log](../images/Kibana_git_log.png)
