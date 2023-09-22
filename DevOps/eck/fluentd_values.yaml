@@ -222,7 +222,7 @@ service:
 ##
 metrics:
   serviceMonitor:
-    enabled: false
+    enabled: true
     additionalLabels:
       release: prometheus-operator
     namespace: ""
@@ -252,28 +252,28 @@ metrics:
     # honorLabels: true
 
   prometheusRule:
-    enabled: false
+    enabled: true
     additionalLabels: {}
     namespace: ""
-    rules: []
-    # - alert: FluentdDown
-    #   expr: up{job="fluentd"} == 0
-    #   for: 5m
-    #   labels:
-    #     context: fluentd
-    #     severity: warning
-    #   annotations:
-    #     summary: "Fluentd Down"
-    #     description: "{{ $labels.pod }} on {{ $labels.nodename }} is down"
-    # - alert: FluentdScrapeMissing
-    #   expr: absent(up{job="fluentd"} == 1)
-    #   for: 15m
-    #   labels:
-    #     context: fluentd
-    #     severity: warning
-    #   annotations:
-    #     summary: "Fluentd Scrape Missing"
-    #     description: "Fluentd instance has disappeared from Prometheus target discovery"
+    rules:
+      - alert: FluentdDown
+        expr: up{job="fluentd"} == 0
+        for: 5m
+        labels:
+          context: fluentd
+          severity: warning
+        annotations:
+          summary: "Fluentd Down"
+          description: "{{ $labels.pod }} on {{ $labels.nodename }} is down"
+      - alert: FluentdScrapeMissing
+        expr: absent(up{job="fluentd"} == 1)
+        for: 15m
+        labels:
+          context: fluentd
+          severity: warning
+        annotations:
+          summary: "Fluentd Scrape Missing"
+          description: "Fluentd instance has disappeared from Prometheus target discovery"
 
 ## Grafana Monitoring Dashboard
 ##
@@ -405,4 +405,9 @@ fileConfigs:
       @type elasticsearch
       hosts "http://elastic:RQsTBU4L253I6UYx533Vot43@elasticsearch-es-default.elastic.svc.cluster.local:9200"
       index_name devops-commit
+    </match>
+    <match devops-pr.*>
+      @type elasticsearch
+      hosts "http://elastic:RQsTBU4L253I6UYx533Vot43@elasticsearch-es-default.elastic.svc.cluster.local:9200"
+      index_name devops-pr
     </match>
