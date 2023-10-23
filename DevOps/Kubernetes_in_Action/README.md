@@ -5,3 +5,4 @@
 Kubernetes를 사용하면서, 무심코 사용했던 기술이지만 개념과 원리에 대해 정리하고자 작성한다.
 
 - [Service](./05_Service.md)
+- [Volume](./06_Volume.md)
