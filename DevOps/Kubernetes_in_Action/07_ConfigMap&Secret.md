@@ -132,3 +132,23 @@ volumes:
 
 따라서 안전을 위해서는 시크릿을 노출할 때는 항상 secret 볼륨을 사용한다.
 
+### 기본 토큰 시크릿
+
+모든 파드에는 secret 볼륨이 자동으로 연결돼 있다.
+
+하기와 같이 `kubectl describe`로 secret 볼륨이 마운트된 것을 보여준다.
+
+```bash
+$ kubectl describe pod/dnsutils     
+Name:             dnsutils
+Namespace:        default
+...
+Containers:
+  dnsutils:
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kxt4s (ro)
+```
+
+시크릿이 갖고 있는 ca.crt, namespace, token은 파드 안에서 쿠버네티스 API 서버와 통신할 때 필요한 모든 것을 나타낸다. 이상적으로는 애플리케이션이 완전히 쿠버네티스를 인지하지 않도록 하고 싶지만, 쿠버네티스와 직접 대화하는 방법 외에 다른 대안이 없으면 secret 볼륨을 통해 제공된 파일을 사용한다.
+
+> 기본적으로 `default-token`은 모든 컨테이너에 마운트되지만, 파드 스펙 안에 `automountService-AccountToken: false`로 지정하거나 파드가 사용하는 서비스 어카운트를 `false`로 지정해 비활성화할 수 있다.
