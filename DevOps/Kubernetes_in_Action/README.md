@@ -7,3 +7,4 @@ Kubernetes를 사용하면서, 무심코 사용했던 기술이지만 개념과 
 - [Service](./05_Service.md)
 - [Volume](./06_Volume.md)
 - [ConfigMap & Secret](./07_ConfigMap&Secret.md)
+- [StatefulSet](./10_StatefulSet.md)
