@@ -9,3 +9,4 @@ Kubernetes를 사용하면서, 무심코 사용했던 기술이지만 개념과 
 - [ConfigMap & Secret](./07_ConfigMap&Secret.md)
 - [StatefulSet](./10_StatefulSet.md)
 - [Internal Service](./11_Internal_Service.md)
+- [Kubernetes API Server Security](./12_API_Security.md)
