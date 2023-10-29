@@ -11,6 +11,8 @@
 7. [KQL - Kibana Query Language](#kql---kibana-query-language)
 8. [Deliver Git Commit log](#deliver-git-commit-log)
 
+ELK의 자세한 내용은 [다음](./ELK/ElasticStack.md)을 참조.
+
 ## Architecture
 
 ![EFK Architecture](../images/EFK.png)
