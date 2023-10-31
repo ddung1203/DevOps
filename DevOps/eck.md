@@ -59,7 +59,7 @@ ECK란, Elasticsearch와 Kibana를 Kubernetes 환경에서 배포하고 관리�
 > 
 > 지금까지 기술한 CRD 구성, Controller 등을 합쳐 놓은 것이 Operator이다.
 > 
-> *너무 어렵다... 얼핏 알거는 같지만 다시 차근차근 공부해보자!*
+> 실제 정의한 [TIL 레포지토리](https://github.com/ddung1203/TIL/blob/main/k8s/24_CRD.md) 내 확인 가능
 
 ## Download ECK(Elastic Cloud on Kubernetes)
 
