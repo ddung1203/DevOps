@@ -59,6 +59,7 @@ eksctl create cluster --name myeks --nodes=3 --region=ap-northeast-2
 ```
 
 > 안되는 것들
+> 
 > Load Balancer Service = class lb -> nlb
 > 
 > Ingress: X
