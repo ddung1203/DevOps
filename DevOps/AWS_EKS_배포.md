@@ -75,7 +75,7 @@ cd aws-eks
 
 `myeks.yaml`
 
-```bash
+```yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
@@ -199,7 +199,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "external"
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
-	service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
 spec:
   type: LoadBalancer
   selector:
@@ -255,8 +255,18 @@ spec:
 - EBS 스냅샷
 - EBS 크기 변경
 
+IAM 역할 생성
+
+-> 위의 `myeks` 클러스터의 경우, eksctl로 작성한 파일 내 IAM 역할이 생성된 것을 확인할 수 있다. 따라서 이 경우 생략
+
+> https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/csi-iam-role.html
+
+추가 기능 관리
+
 > https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/managing-ebs-csi.html
-> 
+
+
+
 
 ```bash
 eksctl get iamserviceaccount --cluster myeks-custom
@@ -271,6 +281,16 @@ kube-system     ebs-csi-controller-sa           arn:aws:iam::065144736597:role/e
 ```bash
 eksctl create addon --name aws-ebs-csi-driver --cluster myeks-custom --service-account-role-arn  arn:aws:iam::065144736597:role/eksctl-myeks-custom-addon-iamserviceaccount-Role1-15HLE8HBOD9CN --force
 ```
+
+> Dynamic Provisioning을 위한 EBS CSI Driver 배포
+> 
+> ```bash
+> git clone https://github.com/kubernetes-sigs/aws-ebs-csi-driver.git
+> cd aws-ebs-csi-driver/examples/kubernetes/dynamic-provisioning/manifests
+> 
+> # type을 gp2와 gp3로 설정 가능
+> kubectl apply -f storageclass.yaml
+> ```
 
 ## Metrics Server
 
