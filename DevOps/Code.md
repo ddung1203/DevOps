@@ -48,19 +48,19 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <ACCOUND_ID>.dkr.ecr.ap-northeast-2.amazonaws.com
-      - REPOSITORY_URI=<ACCOUND_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube
+      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com
+      - REPOSITORY_URI=<ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Building the Docker image...
       - docker build -t youtube .
-      - docker tag youtube:latest <ACCOUND_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
+      - docker tag youtube:latest <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
   post_build:
     commands:
       - echo Pushing the Docker image...
-      - docker push <ACCOUND_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
+      - docker push <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
 ```
 
 ### ECS Deploy
