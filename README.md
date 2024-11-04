@@ -2,11 +2,17 @@
 
 ## Amazon EKS를 위한 DevOps 환경 구축
 
-2022.12~2023.01
+2022.12 ~ 2023.01
 
 - 기여도: EKS, Docker, Helm, Jenkins, ArgoCD, Prometheus, Grafana, Loki, EFS, MySQL DR Planning, 1인 개발
 - `EKS`, `Docker`, `Helm`, `Jenkins`, `ArgoCD`, `Prometheus`, `Grafana`, `Loki`, `EFS`, `MySQL DR Planning`
 - 서비스 운영에 관련된 개발과 인프라 관리 간소화 및 효율적인 관리 운영
+
+2024.11 ~ 
+
+- AWS Code 시리즈 실습
+
+---
 
 [AWS EKS 배포](./DevOps/AWS_EKS_%EB%B0%B0%ED%8F%AC.md)
 
@@ -35,6 +41,8 @@
 [Run a Stateful Application - MySQL](./DevOps/Run_a_Stateful_Application_-_MySQL.md)
 
 [사용된 WAS](./Market.md)
+
+[AWS Code Series](./DevOps/Code.md)
 
 ---
 
