@@ -2,19 +2,19 @@
 
 목차
 
-* 1. [AWS Code Series를 이용한 자동화 구성](#AWSCodeSeries)
-* 2. [Requirements](#Requirements)
-* 3. [Deploy](#Deploy)
-	* 3.1. [ECS Deploy](#ECSDeploy)
-		* 3.1.1. [ECS Task 접속 방법](#ECSTask)
-	* 3.2. [Code Build](#CodeBuild)
-	* 3.3. [Code Pipeline](#CodePipeline)
-		* 3.3.1. [Rolling Update](#RollingUpdate)
-		* 3.3.2. [Blue/Green Update](#BlueGreenUpdate)
+* 1. [AWS Code Series를 이용한 자동화 구성](#1-aws-code-series를-이용한-자동화-구성)
+* 2. [Requirements](#2-requirements)
+* 3. [Deploy](#3-deploy)
+  * 3.1. [ECS Deploy](#31-ecs-deploy)
+    * 3.1.1. [ECS Task 접속 방법](#311-ecs-task-접속-방법)
+  * 3.2. [Code Build](#32-code-build)
+  * 3.3. [Code Pipeline](#33-code-pipeline)
+    * 3.3.1. [Rolling Update](#331-rolling-update)
+    * 3.3.2. [Blue/Green Update](#332-bluegreen-update)
 
 ---
 
-##  1. <a name='AWSCodeSeries'></a>AWS Code Series를 이용한 자동화 구성
+## 1. AWS Code Series를 이용한 자동화 구성
 
 사용된 Web Server : [YouTube Reloaded](https://github.com/ddung1203/youtube-reloaded)
 
@@ -39,11 +39,11 @@ docker run -d --name youtube --network youtube   \
     ddung1203/youtube:latest
 ```
 
-##  2. <a name='Requirements'></a>Requirements
+## 2. Requirements
 
 `ECS`, `ECR`, `EFS`, `Mongo`
 
-##  3. <a name='Deploy'></a>Deploy
+## 3. Deploy
 
 Code Build, Code Deploy, Code Pipeline을 테스트하기 위해 다음을 배포한다.
 
@@ -52,7 +52,7 @@ Code Build, Code Deploy, Code Pipeline을 테스트하기 위해 다음을 배�
 - `EFS`: [EFS 참고](../images/efs.png)
 - `Mongo`
 
-###  3.1. <a name='ECSDeploy'></a>ECS Deploy
+### 3.1. ECS Deploy
 
 ```json
 {
@@ -197,7 +197,7 @@ Code Build, Code Deploy, Code Pipeline을 테스트하기 위해 다음을 배�
 }
 ```
 
-####  3.1.1. <a name='ECSTask'></a>ECS Task 접속 방법
+#### 3.1.1. ECS Task 접속 방법
 
 ```bash
 # Session Manager 설치
@@ -218,7 +218,7 @@ aws ecs execute-command \
     --interactive
 ```
 
-###  3.2. <a name='CodeBuild'></a>Code Build
+### 3.2. Code Build
 
 `buildspec.yaml`
 ```yaml
@@ -262,9 +262,9 @@ artifacts:
 ]
 ```
 
-###  3.3. <a name='CodePipeline'></a>Code Pipeline
+### 3.3. Code Pipeline
 
-####  3.3.1. <a name='RollingUpdate'></a>Rolling Update
+#### 3.3.1. Rolling Update
 
 Code Deploy를 위해선 Code Pipeline에서 기 생성한 Source, Build를 포함하고 Deploy 설정이 필요하다.
 
@@ -286,7 +286,7 @@ Code Deploy를 위해선 Code Pipeline에서 기 생성한 Source, Build를 포�
 > 2. 새로운 태스크가 정상적으로 시작되면 기존 태스크가 종료되고, 또 하나의 새로운 태스크가 시작
 > 3. 기존 태스크도 새로운 태스크로 대체
 
-####  3.3.2. <a name='BlueGreenUpdate'></a>Blue/Green Update
+#### 3.3.2. Blue/Green Update
 
 Blue/Green 배포 방식은 Code Deploy와 연계하여 ECS 서비스가 새로운 태스크 집합을 테스트한 후 트래픽을 전환하도록 설정할 수 있다.
 

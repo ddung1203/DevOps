@@ -8,7 +8,7 @@
 - `EKS`, `Docker`, `Helm`, `Jenkins`, `ArgoCD`, `Prometheus`, `Grafana`, `Loki`, `EFS`, `MySQL DR Planning`
 - 서비스 운영에 관련된 개발과 인프라 관리 간소화 및 효율적인 관리 운영
 
-2024.11 ~ 
+2024.11
 
 - AWS Code 시리즈 실습
 
