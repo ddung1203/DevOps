@@ -1,6 +1,20 @@
 # AWS Code Series
 
-## AWS Code Series를 이용한 자동화 구성
+목차
+
+* 1. [AWS Code Series를 이용한 자동화 구성](#AWSCodeSeries)
+* 2. [Requirements](#Requirements)
+* 3. [Deploy](#Deploy)
+	* 3.1. [ECS Deploy](#ECSDeploy)
+		* 3.1.1. [ECS Task 접속 방법](#ECSTask)
+	* 3.2. [Code Build](#CodeBuild)
+	* 3.3. [Code Pipeline](#CodePipeline)
+		* 3.3.1. [Rolling Update](#RollingUpdate)
+		* 3.3.2. [Blue/Green Update](#BlueGreenUpdate)
+
+---
+
+##  1. <a name='AWSCodeSeries'></a>AWS Code Series를 이용한 자동화 구성
 
 사용된 Web Server : [YouTube Reloaded](https://github.com/ddung1203/youtube-reloaded)
 
@@ -25,11 +39,11 @@ docker run -d --name youtube --network youtube   \
     ddung1203/youtube:latest
 ```
 
-## Requirements
+##  2. <a name='Requirements'></a>Requirements
 
 `ECS`, `ECR`, `EFS`, `Mongo`
 
-## Deploy
+##  3. <a name='Deploy'></a>Deploy
 
 Code Build, Code Deploy, Code Pipeline을 테스트하기 위해 다음을 배포한다.
 
@@ -38,32 +52,7 @@ Code Build, Code Deploy, Code Pipeline을 테스트하기 위해 다음을 배�
 - `EFS`: [EFS 참고](../images/efs.png)
 - `Mongo`
 
-### ECR Push
-
-```yaml
-version: 0.2
-
-phases:
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com
-      - REPOSITORY_URI=<ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
-  build:
-    commands:
-      - echo Building the Docker image...
-      - docker build -t youtube .
-      - docker tag youtube:latest <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
-  post_build:
-    commands:
-      - echo Pushing the Docker image...
-      - docker push <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
-```
-
-### ECS Deploy
+###  3.1. <a name='ECSDeploy'></a>ECS Deploy
 
 ```json
 {
@@ -208,7 +197,7 @@ phases:
 }
 ```
 
-#### ECS Task 접속 방법
+####  3.1.1. <a name='ECSTask'></a>ECS Task 접속 방법
 
 ```bash
 # Session Manager 설치
@@ -229,5 +218,46 @@ aws ecs execute-command \
     --interactive
 ```
 
-### Code Build
+###  3.2. <a name='CodeBuild'></a>Code Build
 
+`buildspec.yaml`
+```yaml
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com
+      - REPOSITORY_URI=<ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t youtube .
+      - docker tag youtube:latest <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
+      - docker push <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"youtube","imageUri":"%s"}]' <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest > imagedefinitions.json
+
+artifacts:
+  files: 
+    - imagedefinitions.json
+    - task-definition.json
+    - appspec.yaml
+```
+
+`imagedefinitions.json` 예시
+```json
+[
+  {
+    "name": "youtube",
+    "imageUri": "<ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest"
+  }
+]
+```
