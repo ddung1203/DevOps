@@ -261,3 +261,185 @@ artifacts:
   }
 ]
 ```
+
+###  3.3. <a name='CodePipeline'></a>Code Pipeline
+
+####  3.3.1. <a name='RollingUpdate'></a>Rolling Update
+
+Code Deploy를 위해선 Code Pipeline에서 기 생성한 Source, Build를 포함하고 Deploy 설정이 필요하다.
+
+**최소 및 최대 실행 작업**
+
+100% min 및 200% max
+
+기본 설정으로 배포할 경우, 롤링 업데이트 방식으로 배포가 진행된다.
+
+1. 기존 3개의 태스크 실행
+2. 새로운 3개의 태스크 실행
+3. 기존 3개의 태스크 Draining
+
+> Maximum Percent가 200%로 설정되어 현재 태스크 수의 두 배까지 실행할 수 있어, 롤링 업데이터 동안 기존 태스크와 새 태스크가 동시에 실행된다.
+
+> 50% min 및 150% max
+> Minimum Healthy Percent와 Maximum Percent 값을 조정하면, ECS가 한 번에 n개의 태스크만 종료하고 새 태스크를 시작하도록 할 수 있다.
+> 1. 기존 3개의 태스크 중 하나를 종료하고 새 태스크 시작
+> 2. 새로운 태스크가 정상적으로 시작되면 기존 태스크가 종료되고, 또 하나의 새로운 태스크가 시작
+> 3. 기존 태스크도 새로운 태스크로 대체
+
+####  3.3.2. <a name='BlueGreenUpdate'></a>Blue/Green Update
+
+Blue/Green 배포 방식은 Code Deploy와 연계하여 ECS 서비스가 새로운 태스크 집합을 테스트한 후 트래픽을 전환하도록 설정할 수 있다.
+
+ECS 서비스 생성 시 Blue/Green으로 설정 후 배포하게 되면 CodeDeploy에 배포 그룹이 생성되며, Blue Green을 위해 기본적으로 두 개의 대상그룹이 생성된다.
+
+`appspec.yaml`
+```yaml
+version: 0.0
+Resources:
+  - myEcsService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: "arn:aws:ecs:ap-northeast-2:<ACCOUNT_ID>:task-definition/VidTask"
+        LoadBalancerInfo:
+          ContainerName: "youtube"
+          ContainerPort: 4000
+```
+
+`task-definition.json`
+```json
+{
+  "containerDefinitions": [
+    {
+      "name": "youtube",
+      "image": "<ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/youtube:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "youtube-4000-tcp",
+          "containerPort": 4000,
+          "hostPort": 4000,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "MONGO_USERNAME",
+          "value": "mongo"
+        },
+        {
+          "name": "MONGO_URL",
+          "value": "10.0.2.90"
+        },
+        {
+          "name": "COOKIE_SECRET",
+          "value": "youtube"
+        },
+        {
+          "name": "MONGO_PASSWORD",
+          "value": "mongo"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "YouTube",
+          "containerPath": "/app/uploads",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/VidTask",
+          "mode": "non-blocking",
+          "awslogs-create-group": "true",
+          "max-buffer-size": "25m",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "family": "VidTask",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [
+    {
+      "name": "YouTube",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0a29dd8823cab60b5",
+        "rootDirectory": "/",
+        "transitEncryption": "ENABLED",
+        "transitEncryptionPort": 2049,
+        "authorizationConfig": {
+          "accessPointId": "fsap-0920405ee92c0e662",
+          "iam": "DISABLED"
+        }
+      }
+    }
+  ],
+  "status": "ACTIVE",
+  "requiresAttributes": [
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.efsAuth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "ecs.capability.efs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
+    }
+  ],
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "Development"
+    }
+  ]
+}
+```
