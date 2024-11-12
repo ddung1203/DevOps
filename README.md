@@ -11,6 +11,7 @@
 2024.11
 
 - AWS Code 시리즈 실습
+- EKS Blue/Green 업그레이드
 
 ---
 
@@ -43,6 +44,8 @@
 [사용된 WAS](./Market.md)
 
 [AWS Code Series](./DevOps/Code.md)
+
+[EKS Blue/Green 업그레이드](./DevOps/EKS_BlueGreen.md)
 
 ---
 
