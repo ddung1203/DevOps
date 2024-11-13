@@ -39,7 +39,7 @@ GitOps 방식으로, 기존 Blue 클러스터의 리소스 설정을 Git 레포�
 
 ### 4.1. Blue 클러스터 리소스 배포
 
-(배포 리소스)[https://github.com/ddung1203/youtube-jenkins/tree/dev/k8s-manifest/helm-charts/youtube]
+[배포 리소스](https://github.com/ddung1203/youtube-jenkins/tree/dev/k8s-manifest/helm-charts/youtube)
 
 
 ```bash
