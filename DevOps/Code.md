@@ -2,15 +2,15 @@
 
 목차
 
-* 1. [AWS Code Series를 이용한 자동화 구성](#1-aws-code-series를-이용한-자동화-구성)
-* 2. [Requirements](#2-requirements)
-* 3. [Deploy](#3-deploy)
-  * 3.1. [ECS Deploy](#31-ecs-deploy)
-    * 3.1.1. [ECS Task 접속 방법](#311-ecs-task-접속-방법)
-  * 3.2. [Code Build](#32-code-build)
-  * 3.3. [Code Pipeline](#33-code-pipeline)
-    * 3.3.1. [Rolling Update](#331-rolling-update)
-    * 3.3.2. [Blue/Green Update](#332-bluegreen-update)
+1. [AWS Code Series를 이용한 자동화 구성](#1-aws-code-series를-이용한-자동화-구성)
+2. [Requirements](#2-requirements)
+3. [Deploy](#3-deploy)
+    1. [ECS Deploy](#31-ecs-deploy)
+        1. [ECS Task 접속 방법](#311-ecs-task-접속-방법)
+    2. [Code Build](#32-code-build)
+    3. [Code Pipeline](#33-code-pipeline)
+        1. [Rolling Update](#331-rolling-update)
+        2. [Blue/Green Update](#332-bluegreen-update)
 
 ---
 
